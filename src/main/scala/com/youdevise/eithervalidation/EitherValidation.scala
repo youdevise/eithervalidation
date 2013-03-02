@@ -91,9 +91,8 @@ import collection.generic.CanBuildFrom
  */
 
 /** Wraps an Either which has a type viewable as TraversableLike in the Left, and a Function1 in the Right */
-case class EitherValidation[Left : EitherValidation.Semigroup, T1, R](e1: Either[Left, T1 => R]) {
+case class EitherValidation[Left, T1, R](e1: Either[Left, T1 => R])(implicit semigroup: EitherValidation.Semigroup[Left]) {
   def apply(e2: Either[Left, T1]): Either[Left, R] = {
-    val semigroup = implicitly[EitherValidation.Semigroup[Left]]
     (e1, e2) match {
       case (Left(l1), Left(l2)) => Left(semigroup.append(l1, l2))
       case (Left(l1), Right(_)) => Left(l1)
